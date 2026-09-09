@@ -1,0 +1,86 @@
+# Meduk Relax — конфигурация Apache
+
+# Главная страница: сначала наш index.html, потом любой index.php
+DirectoryIndex index.html index.php
+
+# Единая кодировка
+AddDefaultCharset UTF-8
+
+# Явные MIME-типы для PWA и локальных шрифтов
+AddType application/manifest+json .webmanifest
+AddType font/woff2 .woff2
+AddType font/ttf .ttf
+
+# Один канонический адрес: HTTPS без www и без /index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Runtime-данные и приватная конфигурация никогда не должны отдаваться по HTTP.
+  RewriteRule (^|/)\.meduk-data(?:/|$) - [F,L,NC]
+
+  RewriteCond %{THE_REQUEST} \s/+index\.html(?:[?\s]) [NC]
+  RewriteRule ^index\.html$ https://meduk.ru/ [R=301,L]
+
+  # SSL терминируется на прокси хостинга, поэтому внутри Apache %{HTTPS} всегда off.
+  # Без проверки X-Forwarded-Proto правило редиректит https-запрос сам на себя — петля.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://meduk.ru%{REQUEST_URI} [R=301,L,NE]
+
+  RewriteCond %{HTTP_HOST} !^meduk\.ru$ [NC]
+  RewriteRule ^ https://meduk.ru%{REQUEST_URI} [R=301,L,NE]
+</IfModule>
+
+<FilesMatch "^(?:meduk-config\.php|\.env(?:\..*)?)$">
+  Require all denied
+</FilesMatch>
+
+# Картинки и шрифты не меняются — их держим в кэше долго
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType font/ttf "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 30 days"
+</IfModule>
+
+# HTML, manifest и JSON браузер обязан перепроверять у сервера. CSS/JS имеют
+# версию в URL (`?v=N`), поэтому их безопасно кешировать надолго: при релизе
+# меняется URL, и старый ответ не подставляется в новую страницу.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|webmanifest|json)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Файл офлайн-режима не кэшируем вовсе: именно из него браузер узнаёт,
+  # что вышла новая версия сайта.
+  <FilesMatch "^sw\.js$">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+
+  # Не давать браузеру угадывать тип файла вопреки заявленному
+  Header always set X-Content-Type-Options "nosniff"
+  # Запрет встраивать сайт в чужую страницу рамкой — защита от подмены кликов
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Чужим сайтам не сообщаем, откуда пришёл посетитель
+  Header always set Referrer-Policy "no-referrer"
+  # Сайту не нужны ни камера, ни микрофон, ни геопозиция — закрываем совсем
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=()"
+  # Политика задаётся HTTP-заголовком; meta в index.html остаётся локальным fallback.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+  # Полгода помнить, что сюда ходят только по https.
+  # Поддомены намеренно не включаем, чтобы не связать руки на будущее.
+  Header always set Strict-Transport-Security "max-age=15552000"
+</IfModule>
+
+# Своя страница вместо стандартной ошибки сервера
+ErrorDocument 404 /404.html
+
+# Сжатие текстовых ответов
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

@@ -1,0 +1,17 @@
+# Библиотеку и cron-команду напрямую не отдаём — они только для PHP/CLI
+<FilesMatch "^(?:lib|retention)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Список файлов папки посторонним не показываем
+Options -Indexes
+
+# Панель не должна попадать в поисковую выдачу
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
