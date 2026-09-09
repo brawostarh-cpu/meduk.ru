@@ -1,10 +1,10 @@
 "use strict";
 
 /* Офлайн-кэш Meduk Relax. Работает только на https (домен meduk.ru). */
-const CACHE = "meduk-relax-v20";
+const CACHE = "meduk-relax-v21";
 /* Тот же номер, что в index.html. Меняется адрес файла — значит старая копия
    из браузерного кэша уже не подойдёт, и человек гарантированно получит новую. */
-const VER = "?v=20";
+const VER = "?v=21";
 const CORE = [
   "./",
   "404.html",
