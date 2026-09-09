@@ -17,6 +17,11 @@ for (const file of ["index.html", "404.html", "manifest.webmanifest", "sw.js", "
   check(exists(file), `missing required file: ${file}`);
 }
 
+const html = read("index.html");
+const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map((match) => match[1]);
+const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+check(duplicateIds.length === 0, `duplicate HTML id values: ${[...new Set(duplicateIds)].join(", ")}`);
+
 const sources = ["index.html", "404.html", "manifest.webmanifest", "sw.js", "app.js", "audio.js", "stats.js", "styles.css"]
   .filter(exists).map(read).join("\n");
 const refs = new Set();
