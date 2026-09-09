@@ -5,6 +5,7 @@
   "description": "Meduk Relax site checks",
   "type": "module",
   "scripts": {
-    "check": "node scripts/check-site.mjs"
+    "check": "node scripts/check-site.mjs",
+    "check:content": "node scripts/check-copy.mjs"
   }
 }
