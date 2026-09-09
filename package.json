@@ -1,0 +1,10 @@
+{
+  "name": "meduk-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Meduk Relax site checks",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-site.mjs"
+  }
+}
