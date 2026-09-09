@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#efe6d0" />
     <meta name="referrer" content="no-referrer" />
     <!-- Тема выбирается до первой отрисовки, поэтому скрипт блокирующий и стоит здесь -->
-    <script src="theme-init.js?v=20"></script>
+    <script src="theme-init.js?v=21"></script>
     <link rel="canonical" href="https://meduk.ru/" />
     <meta property="og:title" content="Meduk Relax" />
     <meta property="og:description" content="Бинауральные ритмы, живой шум и таймеры фокуса. Бесплатно, без рекламы, работает офлайн." />
@@ -30,10 +30,10 @@
     <meta name="twitter:image:alt" content="Обложка звуковой комнаты Meduk Relax" />
     <link rel="icon" type="image/png" href="assets/favicon-64.png" />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
-    <link rel="manifest" href="manifest.webmanifest?v=20" />
-    <!-- ?v=20 в адресах стилей и скриптов: браузеру велено кэшировать их надолго,
+    <link rel="manifest" href="manifest.webmanifest?v=21" />
+    <!-- ?v=21 в адресах стилей и скриптов: браузеру велено кэшировать их надолго,
          и без смены адреса он бы ещё неделю показывал старое оформление -->
-    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="styles.css?v=21" />
   </head>
   <body>
     <a class="skip-link" href="#player">Сразу к звуку</a>
@@ -424,6 +424,7 @@
             </div>
             <div class="data-actions">
               <button type="button" id="exportData">Скачать мои данные</button>
+              <button type="button" id="exportIcs">Скачать маршрут .ics</button>
               <button type="button" id="importData">Загрузить из файла</button>
               <input type="file" id="importFile" accept="application/json,.json" aria-label="Файл с настройками для импорта" hidden />
             </div>
@@ -883,8 +884,8 @@
         ]
       }
     </script>
-    <script src="stats.js?v=20"></script>
-    <script src="audio.js?v=20"></script>
-    <script src="app.js?v=20"></script>
+    <script src="stats.js?v=21"></script>
+    <script src="audio.js?v=21"></script>
+    <script src="app.js?v=21"></script>
   </body>
 </html>

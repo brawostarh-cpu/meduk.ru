@@ -1,0 +1,13 @@
+{
+  "name": "meduk-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Meduk Relax site checks",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-site.mjs",
+    "check:content": "node scripts/check-copy.mjs",
+    "check:contracts": "node scripts/check-contracts.mjs",
+    "check:all": "npm run check && npm run check:content && npm run check:contracts"
+  }
+}

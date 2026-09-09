@@ -6,6 +6,17 @@ DirectoryIndex index.html index.php
 # Единая кодировка
 AddDefaultCharset UTF-8
 
+# В рабочий document root не должны попадать планы, служебные скрипты,
+# npm-метаданные и файлы системы контроля версий. Даже если кто-то случайно
+# загрузит весь архив проекта в public_html, эти материалы не отдаются.
+Options -Indexes
+<FilesMatch "^(?:\.git(?:/.*)?|\.env(?:\..*)?|MEDUK_MASTER_PLAN_VSE_15_VERSIJ\.md|README(?:[^/]*)?\.md|package\.json|package-lock\.json)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteRule ^(?:\.git|scripts|tests|backups|\.local|\.tools|server)(?:/|$) - [F,L,NC]
+</IfModule>
+
 # Явные MIME-типы для PWA и локальных шрифтов
 AddType application/manifest+json .webmanifest
 AddType font/woff2 .woff2

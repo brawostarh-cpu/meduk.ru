@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "updated": "2026-09-09",
+  "publicRelease": false,
+  "reason": "The free local product is being prepared; external legal, payment, mail and staging evidence is not present in this repository.",
+  "gates": [
+    {"id":"owner-and-legal","label":"Статус владельца, оферта, политика и основания обработки ПДн подтверждены","owner":true,"confirmed":false},
+    {"id":"rkn-and-data-map","label":"РКН, локализация и карта данных проверены владельцем","owner":true,"confirmed":false},
+    {"id":"staging-security","label":"Staging, TLS, заголовки, права, бэкап и restore-тест проверены","owner":false,"confirmed":false},
+    {"id":"payment-provider","label":"Тестовая интеграция платёжного провайдера проверена с идемпотентностью, чеками и возвратами","owner":true,"confirmed":false},
+    {"id":"transactional-mail","label":"Почта, SPF/DKIM/DMARC, подтверждение адреса и восстановление проверены","owner":true,"confirmed":false},
+    {"id":"editorial-review","label":"Контент прошёл фактчекинг и редакционное ревью владельца","owner":true,"confirmed":false},
+    {"id":"independent-release-review","label":"Независимая проверка безопасности, миграции и ручное разрешение публикации завершены","owner":true,"confirmed":false}
+  ]
+}

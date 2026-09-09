@@ -1207,7 +1207,70 @@ setInterval(() => {
   renderStats(stats);
 }, 30000);
 
-/* ================= Экспорт / импорт данных ================= */
+/* ================= Маршрут .ics и экспорт данных ================= */
+
+function icsEscape(value) {
+  return String(value).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+}
+
+function icsUtc(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+}
+
+function foldIcsLine(line) {
+  const encoder = new TextEncoder();
+  const chunks = [];
+  let current = "";
+  for (const char of line) {
+    if (encoder.encode(current + char).length > 74 && current) {
+      chunks.push(current);
+      current = ` ${char}`;
+    } else current += char;
+  }
+  if (current) chunks.push(current);
+  return chunks.join("\\r\\n");
+}
+
+function exportIcs() {
+  const start = new Date();
+  start.setSeconds(0, 0);
+  const events = [];
+  let cursor = new Date(start);
+  for (let cycle = 1; cycle <= pomo.cycles; cycle += 1) {
+    const workStart = new Date(cursor);
+    const workEnd = new Date(cursor.getTime() + pomo.workMin * 60000);
+    events.push({ title: `Фокус · круг ${cycle}`, start: workStart, end: workEnd });
+    cursor = workEnd;
+    if (cycle < pomo.cycles) {
+      const pauseStart = new Date(cursor);
+      const pauseEnd = new Date(cursor.getTime() + pomo.breakMin * 60000);
+      events.push({ title: `Пауза · круг ${cycle}`, start: pauseStart, end: pauseEnd });
+      cursor = pauseEnd;
+    }
+  }
+  const stamp = icsUtc(new Date());
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Meduk//Focus Route//RU", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+  events.forEach((event, index) => {
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:meduk-${Date.now()}-${index}@meduk.ru`);
+    lines.push(`DTSTAMP:${stamp}`);
+    lines.push(`DTSTART:${icsUtc(event.start)}`);
+    lines.push(`DTEND:${icsUtc(event.end)}`);
+    lines.push(`SUMMARY:${icsEscape(event.title)}`);
+    lines.push("END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  const blob = new Blob([lines.map(foldIcsLine).join("\\r\\n") + "\\r\\n"], { type: "text/calendar;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `meduk-route-${start.toISOString().slice(0, 10)}.ics`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  showToast("Маршрут сохранён в формате .ics");
+}
 
 function exportData() {
   const data = {};
@@ -1967,6 +2030,7 @@ function wire() {
 
   /* Данные */
   $("#exportData").addEventListener("click", exportData);
+  $("#exportIcs").addEventListener("click", exportIcs);
   $("#importData").addEventListener("click", () => $("#importFile").click());
   $("#importFile").addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
